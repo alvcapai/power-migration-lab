@@ -1,13 +1,27 @@
 # ==========================================
-# SSH Key
+# SSH Key - Create New or Use Existing
 # ==========================================
 
+# Create new SSH key if not using existing
 resource "ibm_is_ssh_key" "ssh_key" {
-  count          = var.create_bastion ? 1 : 0
+  count          = var.create_bastion && !var.use_existing_ssh_key ? 1 : 0
   name           = var.ssh_key_name
   public_key     = var.ssh_public_key
   resource_group = var.resource_group_id
   tags           = var.tags
+}
+
+# Data source for existing SSH key
+data "ibm_is_ssh_key" "existing_ssh_key" {
+  count = var.create_bastion && var.use_existing_ssh_key ? 1 : 0
+  name  = var.existing_ssh_key_name
+}
+
+# Local to determine which SSH key ID to use
+locals {
+  ssh_key_id = var.create_bastion ? (
+    var.use_existing_ssh_key ? data.ibm_is_ssh_key.existing_ssh_key[0].id : ibm_is_ssh_key.ssh_key[0].id
+  ) : null
 }
 
 # ==========================================
@@ -29,7 +43,7 @@ resource "ibm_is_instance" "bastion" {
     security_groups = [var.security_group_id]
   }
 
-  keys = [ibm_is_ssh_key.ssh_key[0].id]
+  keys = [local.ssh_key_id]
 
   boot_volume {
     name = "${var.bastion_name}-boot"

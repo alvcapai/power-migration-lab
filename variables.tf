@@ -47,9 +47,22 @@ variable "tags" {
 # SSH Configuration
 # ==========================================
 
-variable "ssh_public_key" {
-  description = "SSH public key content for accessing instances"
+variable "use_existing_ssh_key" {
+  description = "Whether to use an existing SSH key (true) or create a new one (false)"
+  type        = bool
+  default     = false
+}
+
+variable "existing_ssh_key_name" {
+  description = "Name of existing SSH key in IBM Cloud (required if use_existing_ssh_key is true)"
   type        = string
+  default     = ""
+}
+
+variable "ssh_public_key" {
+  description = "SSH public key content for creating new SSH key (required if use_existing_ssh_key is false)"
+  type        = string
+  default     = ""
 }
 
 variable "allowed_ssh_cidr" {

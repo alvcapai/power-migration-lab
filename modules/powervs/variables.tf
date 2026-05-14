@@ -48,13 +48,23 @@ variable "powervs_storage_pool" {
   type        = string
 }
 
+variable "use_existing_ssh_key" {
+  description = "Whether to use an existing SSH key"
+  type        = bool
+}
+
+variable "existing_ssh_key_name" {
+  description = "Name of existing SSH key"
+  type        = string
+}
+
 variable "powervs_ssh_key_name" {
-  description = "Name for the PowerVS SSH key"
+  description = "Name for the PowerVS SSH key (when creating new)"
   type        = string
 }
 
 variable "ssh_public_key" {
-  description = "SSH public key content"
+  description = "SSH public key content (when creating new)"
   type        = string
 }
 

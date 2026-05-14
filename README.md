@@ -89,8 +89,14 @@ create_resource_group = true
 prefix               = "pml"
 tags                 = ["power-migration", "sandbox", "terraform"]
 
-# SSH Configuration
-ssh_public_key    = "ssh-rsa AAAAB3NzaC1yc2E... your-email@example.com"
+# SSH Configuration - Option 1: Use existing key (recommended for Schematics)
+use_existing_ssh_key   = true
+existing_ssh_key_name  = "my-existing-key-name"
+
+# SSH Configuration - Option 2: Create new key (provide public key content)
+# use_existing_ssh_key = false
+# ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2E... your-email@example.com"
+
 allowed_ssh_cidr  = "0.0.0.0/0"  # Restrinja para seu IP em produção
 
 # PowerVS Configuration
@@ -110,13 +116,31 @@ create_nim = false
 
 Para lista completa de variáveis e suas descrições, consulte [docs/variables.md](docs/variables.md).
 
-### 3. Gere um Par de Chaves SSH (se necessário)
+### 3. Configure SSH Key
 
+**Opção A: Usar uma chave SSH existente (Recomendado para Schematics)**
+
+Se você já tem uma chave SSH registrada no IBM Cloud:
+
+```hcl
+use_existing_ssh_key   = true
+existing_ssh_key_name  = "nome-da-sua-chave-existente"
+```
+
+**Opção B: Criar uma nova chave SSH**
+
+Se você deseja criar uma nova chave SSH:
+
+1. Gere um par de chaves (se necessário):
 ```bash
 ssh-keygen -t rsa -b 4096 -f ~/.ssh/power_migration_lab -C "power-migration-lab"
 ```
 
-Use o conteúdo de `~/.ssh/power_migration_lab.pub` na variável `ssh_public_key`.
+2. Configure no `terraform.tfvars`:
+```hcl
+use_existing_ssh_key = false
+ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2E... your-email@example.com"
+```
 
 ## Uso
 

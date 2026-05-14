@@ -52,18 +52,20 @@ module "vpc" {
 module "bastion" {
   source = "./modules/bastion"
 
-  create_bastion    = var.create_bastion
-  resource_group_id = module.resource_group.resource_group_id
-  bastion_name      = local.bastion_name
-  vpc_id            = module.vpc.vpc_id
-  subnet_id         = module.vpc.subnet_id
-  security_group_id = module.vpc.security_group_id
-  ssh_key_name      = local.ssh_key_name
-  ssh_public_key    = var.ssh_public_key
-  bastion_profile   = var.bastion_profile
-  bastion_image     = var.bastion_image
-  zone              = var.zone
-  tags              = local.common_tags
+  create_bastion         = var.create_bastion
+  resource_group_id      = module.resource_group.resource_group_id
+  bastion_name           = local.bastion_name
+  vpc_id                 = module.vpc.vpc_id
+  subnet_id              = module.vpc.subnet_id
+  security_group_id      = module.vpc.security_group_id
+  use_existing_ssh_key   = var.use_existing_ssh_key
+  existing_ssh_key_name  = var.existing_ssh_key_name
+  ssh_key_name           = local.ssh_key_name
+  ssh_public_key         = var.ssh_public_key
+  bastion_profile        = var.bastion_profile
+  bastion_image          = var.bastion_image
+  zone                   = var.zone
+  tags                   = local.common_tags
 }
 
 # ==========================================
@@ -83,6 +85,8 @@ module "powervs" {
   powervs_network_type          = var.powervs_network_type
   powervs_network_dns           = var.powervs_network_dns
   powervs_storage_pool          = var.powervs_storage_pool
+  use_existing_ssh_key          = var.use_existing_ssh_key
+  existing_ssh_key_name         = var.existing_ssh_key_name
   powervs_ssh_key_name          = local.powervs_ssh_key_name
   ssh_public_key                = var.ssh_public_key
   aix_image_name                = var.aix_image_name

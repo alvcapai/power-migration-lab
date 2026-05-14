@@ -11,9 +11,13 @@ tags                  = ["power-migration", "sandbox", "terraform"]
 # ==========================================
 # SSH Configuration
 # ==========================================
-# REQUIRED: Your SSH public key content
-# Get it from: cat ~/.ssh/id_rsa.pub
-ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC... your-email@example.com"
+# Option 1: Use an existing SSH key (recommended for Schematics)
+use_existing_ssh_key   = true
+existing_ssh_key_name  = "my-existing-key-name"
+
+# Option 2: Create a new SSH key (provide public key content)
+# use_existing_ssh_key = false
+# ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC... your-email@example.com"
 
 # IMPORTANT: Restrict this to your IP in production!
 # Example: "203.0.113.0/32" for a single IP

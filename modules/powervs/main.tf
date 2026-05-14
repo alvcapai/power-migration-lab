@@ -18,13 +18,27 @@ resource "ibm_resource_instance" "powervs_workspace" {
 }
 
 # ==========================================
-# PowerVS SSH Key
+# PowerVS SSH Key - Create New or Use Existing
 # ==========================================
 
+# Create new SSH key if not using existing
 resource "ibm_pi_key" "ssh_key" {
+  count                = var.use_existing_ssh_key ? 0 : 1
   pi_cloud_instance_id = ibm_resource_instance.powervs_workspace.guid
   pi_key_name          = var.powervs_ssh_key_name
   pi_ssh_key           = var.ssh_public_key
+}
+
+# Data source for existing SSH key
+data "ibm_pi_key" "existing_ssh_key" {
+  count                = var.use_existing_ssh_key ? 1 : 0
+  pi_cloud_instance_id = ibm_resource_instance.powervs_workspace.guid
+  pi_key_name          = var.existing_ssh_key_name
+}
+
+# Local to determine which SSH key name to use
+locals {
+  ssh_key_name = var.use_existing_ssh_key ? data.ibm_pi_key.existing_ssh_key[0].pi_key_name : ibm_pi_key.ssh_key[0].pi_key_name
 }
 
 # ==========================================
@@ -61,7 +75,7 @@ resource "ibm_pi_instance" "aix_source" {
   pi_proc_type         = var.aix_source_proc_type
   pi_sys_type          = var.aix_source_sys_type
   pi_storage_pool      = var.powervs_storage_pool
-  pi_key_pair_name     = ibm_pi_key.ssh_key.pi_key_name
+  pi_key_pair_name     = local.ssh_key_name
 
   pi_network {
     network_id = ibm_pi_network.private_network.network_id
@@ -105,7 +119,7 @@ resource "ibm_pi_instance" "aix_target" {
   pi_proc_type         = var.aix_target_proc_type
   pi_sys_type          = var.aix_target_sys_type
   pi_storage_pool      = var.powervs_storage_pool
-  pi_key_pair_name     = ibm_pi_key.ssh_key.pi_key_name
+  pi_key_pair_name     = local.ssh_key_name
 
   pi_network {
     network_id = ibm_pi_network.private_network.network_id
@@ -150,7 +164,7 @@ resource "ibm_pi_instance" "aix_nim" {
   pi_proc_type         = var.aix_nim_proc_type
   pi_sys_type          = var.aix_nim_sys_type
   pi_storage_pool      = var.powervs_storage_pool
-  pi_key_pair_name     = ibm_pi_key.ssh_key.pi_key_name
+  pi_key_pair_name     = local.ssh_key_name
 
   pi_network {
     network_id = ibm_pi_network.private_network.network_id
