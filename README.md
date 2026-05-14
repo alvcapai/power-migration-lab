@@ -37,7 +37,7 @@ Para mais detalhes sobre a arquitetura, consulte [docs/architecture.md](docs/arc
 ### Conta IBM Cloud
 
 - Conta IBM Cloud ativa
-- API Key com permissões para:
+- Permissões necessárias para:
   - IBM Power Virtual Server
   - VPC Infrastructure
   - Cloud Object Storage
@@ -52,12 +52,14 @@ Para mais detalhes sobre a arquitetura, consulte [docs/architecture.md](docs/arc
 
 ### Permissões Necessárias
 
-O usuário/service ID associado à API Key deve ter as seguintes permissões:
+Ao executar no IBM Cloud Schematics, o workspace deve ter as seguintes permissões:
 
 - **Power Systems Virtual Server**: Editor ou Administrator
 - **VPC Infrastructure Services**: Editor ou Administrator
 - **Cloud Object Storage**: Editor ou Administrator
 - **Resource Group**: Viewer (mínimo) ou Editor (se criar novo)
+
+**Nota**: Quando executado no Schematics, a autenticação é gerenciada automaticamente pelo workspace.
 
 ## Configuração
 
@@ -79,9 +81,6 @@ cp terraform.tfvars.example terraform.tfvars
 Edite `terraform.tfvars` com seus valores específicos:
 
 ```hcl
-# IBM Cloud Authentication
-ibmcloud_api_key = "YOUR_API_KEY_HERE"
-
 # General Configuration
 region               = "us-south"
 zone                 = "us-south-1"
@@ -109,19 +108,9 @@ aix_target_memory     = "4"
 create_nim = false
 ```
 
-**Importante**: Nunca commite o arquivo `terraform.tfvars` com credenciais reais!
-
 Para lista completa de variáveis e suas descrições, consulte [docs/variables.md](docs/variables.md).
 
-### 3. Obtenha sua API Key
-
-```bash
-# Via IBM Cloud CLI
-ibmcloud login
-ibmcloud iam api-key-create power-migration-lab-key -d "Key for Power Migration Lab"
-```
-
-### 4. Gere um Par de Chaves SSH (se necessário)
+### 3. Gere um Par de Chaves SSH (se necessário)
 
 ```bash
 ssh-keygen -t rsa -b 4096 -f ~/.ssh/power_migration_lab -C "power-migration-lab"
@@ -131,7 +120,23 @@ Use o conteúdo de `~/.ssh/power_migration_lab.pub` na variável `ssh_public_key
 
 ## Uso
 
-### Inicializar Terraform
+### Executando no IBM Cloud Schematics (Recomendado)
+
+Este projeto está configurado para ser executado no IBM Cloud Schematics, que gerencia automaticamente a autenticação:
+
+1. Acesse o IBM Cloud Schematics
+2. Crie um novo workspace
+3. Aponte para este repositório
+4. Configure as variáveis necessárias (exceto `ibmcloud_api_key`)
+5. Execute o plano e aplique
+
+### Executando Localmente
+
+Se executar localmente, você precisará configurar a autenticação via:
+- Variável de ambiente `IC_API_KEY`
+- IBM Cloud CLI (`ibmcloud login`)
+
+#### Inicializar Terraform
 
 ```bash
 terraform init
@@ -282,7 +287,14 @@ Após provisionar a infraestrutura com este projeto Terraform:
 
 ### Erro: "No valid credential sources found"
 
-Verifique se a variável `ibmcloud_api_key` está configurada corretamente no `terraform.tfvars`.
+**No Schematics**: Verifique se o workspace tem as permissões corretas configuradas.
+
+**Localmente**: Configure a autenticação via:
+```bash
+export IC_API_KEY="your-api-key"
+# ou
+ibmcloud login
+```
 
 ### Erro: "Image not found" no PowerVS
 

@@ -1,11 +1,4 @@
 # ==========================================
-# IBM Cloud Authentication
-# ==========================================
-# REQUIRED: Your IBM Cloud API Key
-# Get it from: ibmcloud iam api-key-create <key-name>
-ibmcloud_api_key = "YOUR_API_KEY_HERE"
-
-# ==========================================
 # General Configuration
 # ==========================================
 region                = "us-south"

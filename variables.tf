@@ -1,14 +1,4 @@
 # ==========================================
-# IBM Cloud Authentication
-# ==========================================
-
-variable "ibmcloud_api_key" {
-  description = "IBM Cloud API Key for authentication"
-  type        = string
-  sensitive   = true
-}
-
-# ==========================================
 # General Configuration
 # ==========================================
 
