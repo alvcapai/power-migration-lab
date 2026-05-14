@@ -1,0 +1,115 @@
+# ==========================================
+# IBM Cloud Authentication
+# ==========================================
+# REQUIRED: Your IBM Cloud API Key
+# Get it from: ibmcloud iam api-key-create <key-name>
+ibmcloud_api_key = "YOUR_API_KEY_HERE"
+
+# ==========================================
+# General Configuration
+# ==========================================
+region                = "us-south"
+zone                  = "us-south-1"
+resource_group_name   = "power-migration-lab"
+create_resource_group = true
+prefix                = "pml"
+tags                  = ["power-migration", "sandbox", "terraform"]
+
+# ==========================================
+# SSH Configuration
+# ==========================================
+# REQUIRED: Your SSH public key content
+# Get it from: cat ~/.ssh/id_rsa.pub
+ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC... your-email@example.com"
+
+# IMPORTANT: Restrict this to your IP in production!
+# Example: "203.0.113.0/32" for a single IP
+allowed_ssh_cidr = "0.0.0.0/0"
+
+# ==========================================
+# Cloud Object Storage Configuration
+# ==========================================
+create_cos                = true
+cos_instance_name         = "migration-artifacts"
+cos_bucket_name           = "migration-artifacts"
+cos_plan                  = "standard"
+cos_bucket_storage_class  = "standard"
+
+# ==========================================
+# VPC Configuration
+# ==========================================
+create_vpc              = true
+vpc_name                = "sandbox"
+vpc_subnet_cidr         = "10.240.0.0/24"
+vpc_address_prefix_cidr = "10.240.0.0/16"
+
+# ==========================================
+# Bastion/Staging VSI Configuration
+# ==========================================
+create_bastion  = true
+bastion_name    = "bastion"
+bastion_profile = "cx2-2x4"
+bastion_image   = "ibm-ubuntu-22-04-3-minimal-amd64-1"
+
+# ==========================================
+# PowerVS Workspace Configuration
+# ==========================================
+powervs_workspace_name        = "migration-lab"
+powervs_service_instance_name = "migration-lab"
+
+# IMPORTANT: Check available datacenters and zones
+# Available datacenters: dal12, dal13, us-east, lon04, lon06, syd04, syd05, tok04, etc.
+powervs_datacenter = "dal12"
+powervs_zone       = "us-south"
+
+powervs_network_name = "private-net"
+powervs_network_cidr = "192.168.100.0/24"
+powervs_network_type = "vlan"
+powervs_network_dns  = ["9.9.9.9", "1.1.1.1"]
+
+# Storage pool: Tier1 (faster, more expensive) or Tier3 (slower, cheaper)
+powervs_storage_pool = "Tier3"
+
+# ==========================================
+# AIX Configuration
+# ==========================================
+# IMPORTANT: Check available AIX images in your datacenter
+# List images: ibmcloud pi images --json
+# Common images: 7200-05-06, 7300-02-01, 7300-02-02
+aix_image_name = "7300-02-01"
+
+aix_source_name = "aix-src-01"
+aix_target_name = "aix-dst-01"
+aix_nim_name    = "aix-nim-01"
+
+# Source instance sizing
+aix_source_processors = "0.5"
+aix_source_memory     = "4"
+aix_source_proc_type  = "shared"
+aix_source_sys_type   = "s922"
+
+# Target instance sizing
+aix_target_processors = "0.5"
+aix_target_memory     = "4"
+aix_target_proc_type  = "shared"
+aix_target_sys_type   = "s922"
+
+# NIM instance sizing (if created)
+aix_nim_processors = "0.5"
+aix_nim_memory     = "4"
+aix_nim_proc_type  = "shared"
+aix_nim_sys_type   = "s922"
+
+# ==========================================
+# Storage Configuration
+# ==========================================
+# Additional volumes for data/application volume groups
+source_data_volume_size = 20
+target_data_volume_size = 20
+nim_data_volume_size    = 50
+
+# ==========================================
+# Feature Flags
+# ==========================================
+# Set to true to create an AIX NIM server
+create_nim = false

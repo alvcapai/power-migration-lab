@@ -1,0 +1,78 @@
+---
+# Playbook: site.yml
+# Purpose: Master playbook to run complete migration workflow
+# Usage: ansible-playbook -i inventory/inventory.ini playbooks/site.yml \
+#          -e "target_restore_disk=hdisk1 confirm_destructive_actions=true"
+#
+# This playbook orchestrates the complete AIX migration workflow:
+# 1. Test connectivity
+# 2. Prepare source system
+# 3. Create backups
+# 4. Transfer artifacts
+# 5. Restore on target
+# 6. Validate migration
+
+- name: AIX Migration Lab - Complete Workflow
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Display workflow introduction
+      ansible.builtin.debug:
+        msg: |
+          ========================================
+          AIX Migration Lab - Complete Workflow
+          ========================================
+          
+          This playbook will execute the complete migration workflow:
+          
+          Step 1: Test connectivity to all hosts
+          Step 2: Prepare AIX source system
+          Step 3: Create backups (mksysb, savevg)
+          Step 4: Transfer artifacts via staging
+          Step 5: Restore datavg on target
+          Step 6: Validate migration
+          
+          Required variables:
+          - target_restore_disk: {{ target_restore_disk | default('NOT SET') }}
+          - confirm_destructive_actions: {{ confirm_destructive_actions | default(false) }}
+          
+          ========================================
+
+- name: Step 1 - Test Connectivity
+  ansible.builtin.import_playbook: 00_ping.yml
+
+- name: Step 2 - Prepare Source
+  ansible.builtin.import_playbook: 01_prepare_source.yml
+
+- name: Step 3 - Backup Source
+  ansible.builtin.import_playbook: 02_backup_source.yml
+
+- name: Step 4 - Transfer Artifacts
+  ansible.builtin.import_playbook: 03_transfer_artifacts.yml
+
+- name: Step 5 - Restore Target
+  ansible.builtin.import_playbook: 04_restore_target_datavg.yml
+
+- name: Step 6 - Validate Migration
+  ansible.builtin.import_playbook: 05_validate_migration.yml
+
+- name: Workflow Complete
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Display completion message
+      ansible.builtin.debug:
+        msg: |
+          ========================================
+          AIX Migration Lab - Workflow Complete
+          ========================================
+          
+          All steps completed successfully!
+          
+          Check the reports directory for validation results.
+          
+          Remember: This is a sandbox environment.
+          For production migrations, additional steps are required.
+          ========================================
+
+# Made with Bob

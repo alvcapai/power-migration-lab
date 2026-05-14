@@ -1,0 +1,15 @@
+---
+# Ansible Galaxy requirements
+# Install with: ansible-galaxy install -r requirements.yml
+
+collections:
+  - name: ansible.posix
+    version: ">=1.5.0"
+  
+  - name: community.general
+    version: ">=7.0.0"
+
+# No specific roles required for this project
+# All roles are custom and included in the roles/ directory
+
+# Made with Bob

@@ -1,0 +1,35 @@
+---
+# Playbook: 02_backup_source.yml
+# Purpose: Create mksysb and savevg backups on AIX source
+# Usage: ansible-playbook -i inventory/inventory.ini playbooks/02_backup_source.yml
+
+- name: Backup AIX source system
+  hosts: aix_source
+  gather_facts: false
+  
+  tasks:
+    - name: Include aix_backup role
+      ansible.builtin.include_role:
+        name: aix_backup
+
+- name: Backup summary
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Display summary
+      ansible.builtin.debug:
+        msg: |
+          ========================================
+          AIX Source Backup Complete
+          ========================================
+          
+          Backup files created:
+          - {{ backup_dir_aix }}/{{ rootvg_mksysb_name }}
+          - {{ backup_dir_aix }}/{{ datavg_savevg_name }}
+          - {{ backup_dir_aix }}/{{ backup_log_name }}
+          
+          Next step:
+          Run playbooks/03_transfer_artifacts.yml to transfer backups
+          ========================================
+
+# Made with Bob

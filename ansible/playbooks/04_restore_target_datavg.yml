@@ -1,0 +1,89 @@
+---
+# Playbook: 04_restore_target_datavg.yml
+# Purpose: Restore datavg on AIX target system
+# Usage: ansible-playbook -i inventory/inventory.ini playbooks/04_restore_target_datavg.yml \
+#          -e "target_restore_disk=hdisk1 confirm_destructive_actions=true"
+#
+# WARNING: This is a DESTRUCTIVE operation!
+# The specified disk will be completely overwritten.
+# Always verify the disk name before running.
+
+- name: Pre-flight checks
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Verify target_restore_disk is specified
+      ansible.builtin.fail:
+        msg: |
+          ERROR: target_restore_disk must be specified!
+          
+          This playbook performs a DESTRUCTIVE operation.
+          You must explicitly specify which disk to use for restore.
+          
+          Example:
+            ansible-playbook playbooks/04_restore_target_datavg.yml \
+              -e "target_restore_disk=hdisk1 confirm_destructive_actions=true"
+          
+          Available disks can be checked with: lspv
+      when: target_restore_disk is not defined or target_restore_disk == ""
+    
+    - name: Verify destructive actions are confirmed
+      ansible.builtin.fail:
+        msg: |
+          ERROR: confirm_destructive_actions must be set to true!
+          
+          This playbook will OVERWRITE the disk: {{ target_restore_disk }}
+          All data on this disk will be LOST.
+          
+          If you are sure, run with:
+            ansible-playbook playbooks/04_restore_target_datavg.yml \
+              -e "target_restore_disk={{ target_restore_disk }} confirm_destructive_actions=true"
+      when: not (confirm_destructive_actions | default(false) | bool)
+    
+    - name: Display warning
+      ansible.builtin.debug:
+        msg: |
+          ========================================
+          WARNING: DESTRUCTIVE OPERATION
+          ========================================
+          
+          Target disk: {{ target_restore_disk }}
+          This disk will be COMPLETELY OVERWRITTEN
+          
+          Proceeding in 5 seconds...
+          Press Ctrl+C to abort
+          ========================================
+    
+    - name: Pause for confirmation
+      ansible.builtin.pause:
+        seconds: 5
+
+- name: Restore datavg on AIX target
+  hosts: aix_target
+  gather_facts: false
+  tasks:
+    - name: Include aix_restore_datavg role
+      ansible.builtin.include_role:
+        name: aix_restore_datavg
+
+- name: Restore summary
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Display summary
+      ansible.builtin.debug:
+        msg: |
+          ========================================
+          AIX Target Restore Complete
+          ========================================
+          
+          Restored:
+          - Volume group: {{ source_data_vg }}
+          - Filesystem: {{ appdata_mount }}
+          - Application data
+          
+          Next step:
+          Run playbooks/05_validate_migration.yml to validate the migration
+          ========================================
+
+# Made with Bob

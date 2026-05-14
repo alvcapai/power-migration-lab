@@ -1,0 +1,71 @@
+---
+# Global variables for AIX migration lab
+
+# Migration identification
+migration_id: "aix-powervs-lab"
+migration_timestamp: "{{ ansible_date_time.iso8601_basic_short }}"
+
+# Directory paths
+backup_dir_aix: "/backup"
+staging_dir_linux: "/data/migration"
+appdata_mount: "/appdata"
+scripts_dir: "/opt/migration"
+
+# Volume group and filesystem configuration
+source_data_vg: "datavg"
+source_data_lv: "applv"
+source_data_fs_size: "5G"
+source_data_fs_type: "jfs2"
+
+# Backup file names
+rootvg_mksysb_name: "source_rootvg.mksysb"
+datavg_savevg_name: "source_datavg.savevg"
+backup_log_name: "migration-backup.log"
+
+# Fake data for testing
+fake_data_files:
+  - name: "dados.txt"
+    content: |
+      # Fake application data
+      # Generated: {{ ansible_date_time.iso8601 }}
+      Application: Test App
+      Version: 1.0.0
+      Environment: Migration Lab
+      Data: This is test data for migration validation
+  - name: "app.conf"
+    content: |
+      # Application configuration
+      app_name=TestApp
+      app_version=1.0.0
+      environment=lab
+      log_level=INFO
+  - name: "version.txt"
+    content: "1.0.0-{{ migration_timestamp }}"
+
+# Cloud Object Storage configuration
+enable_cos_upload: false
+cos_bucket_name: ""
+cos_region: "us-south"
+
+# Safety flags
+confirm_destructive_actions: false
+target_restore_disk: ""
+source_data_disk: ""
+
+# SSH and connectivity
+ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
+# Timeouts (in seconds)
+command_timeout: 3600
+backup_timeout: 7200
+restore_timeout: 7200
+
+# Validation settings
+validate_checksums: true
+validate_filesystem_content: true
+
+# Reporting
+report_dir: "reports"
+report_format: "markdown"
+
+# Made with Bob

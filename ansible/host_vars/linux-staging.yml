@@ -1,0 +1,34 @@
+---
+# Host-specific variables for Linux staging/bastion host
+
+# Host identification
+host_role: "staging"
+host_description: "Linux bastion and staging server"
+
+# Staging directory configuration
+staging_base_dir: "/data/migration"
+staging_artifacts_dir: "{{ staging_base_dir }}/artifacts"
+staging_logs_dir: "{{ staging_base_dir }}/logs"
+staging_scripts_dir: "{{ staging_base_dir }}/scripts"
+
+# Create these directories
+staging_directories:
+  - "{{ staging_base_dir }}"
+  - "{{ staging_artifacts_dir }}"
+  - "{{ staging_logs_dir }}"
+  - "{{ staging_scripts_dir }}"
+
+# IBM Cloud CLI configuration
+ibmcloud_cli_installed: false
+cos_plugin_installed: false
+
+# Transfer settings
+use_compression: true
+compression_level: 6
+verify_checksums: true
+
+# Cleanup settings
+cleanup_after_transfer: false
+retention_days: 7
+
+# Made with Bob

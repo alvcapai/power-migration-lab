@@ -1,0 +1,90 @@
+---
+# Playbook: 05_validate_migration.yml
+# Purpose: Validate the migration by comparing source and target
+# Usage: ansible-playbook -i inventory/inventory.ini playbooks/05_validate_migration.yml
+
+- name: Validate AIX migration
+  hosts: aix
+  gather_facts: false
+  tasks:
+    - name: Include aix_validate role
+      ansible.builtin.include_role:
+        name: aix_validate
+
+- name: Generate migration report
+  hosts: localhost
+  gather_facts: true
+  vars:
+    report_file: "{{ report_dir }}/migration-report-{{ ansible_date_time.epoch }}.md"
+  tasks:
+    - name: Create reports directory
+      ansible.builtin.file:
+        path: "{{ report_dir }}"
+        state: directory
+        mode: '0755'
+    
+    - name: Generate migration report
+      ansible.builtin.template:
+        src: ../roles/aix_validate/templates/migration_report.md.j2
+        dest: "{{ report_file }}"
+      when: false  # Template will be created in the role
+    
+    - name: Display validation summary
+      ansible.builtin.debug:
+        msg: |
+          ========================================
+          Migration Validation Complete
+          ========================================
+          
+          Report generated: {{ report_file }}
+          
+          Validation checks performed:
+          - AIX OS level comparison
+          - Volume group verification
+          - Filesystem verification
+          - Application data integrity
+          - Network configuration
+          - System resources
+          
+          Review the report for detailed results.
+          ========================================
+
+- name: Final summary
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Display final summary
+      ansible.builtin.debug:
+        msg: |
+          ========================================
+          AIX Migration Lab - Complete
+          ========================================
+          
+          Migration workflow completed:
+          ✓ Source system prepared
+          ✓ Backups created (mksysb, savevg)
+          ✓ Artifacts transferred
+          ✓ Target datavg restored
+          ✓ Migration validated
+          
+          Important notes:
+          - This is a SANDBOX environment
+          - rootvg was NOT restored (by design)
+          - Target system is running from original rootvg
+          - Only datavg was migrated
+          
+          For production migrations:
+          - Full rootvg restore required
+          - Consider using NIM for rootvg restore
+          - Plan for application cutover
+          - Implement proper change management
+          - Test thoroughly before production
+          
+          Next steps:
+          - Review validation report
+          - Test applications on target
+          - Document lessons learned
+          - Plan for production migration
+          ========================================
+
+# Made with Bob

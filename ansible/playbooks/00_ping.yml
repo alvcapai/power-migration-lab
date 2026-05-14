@@ -1,0 +1,80 @@
+---
+# Playbook: 00_ping.yml
+# Purpose: Validate SSH connectivity to all hosts
+# Usage: ansible-playbook -i inventory/inventory.ini playbooks/00_ping.yml
+
+- name: Test connectivity to Linux staging host
+  hosts: bastion
+  gather_facts: true
+  tasks:
+    - name: Ping Linux staging
+      ansible.builtin.ping:
+      
+    - name: Display Linux staging info
+      ansible.builtin.debug:
+        msg: |
+          Host: {{ inventory_hostname }}
+          OS: {{ ansible_distribution }} {{ ansible_distribution_version }}
+          Kernel: {{ ansible_kernel }}
+          Architecture: {{ ansible_architecture }}
+
+- name: Test connectivity to AIX hosts
+  hosts: aix
+  gather_facts: false
+  tasks:
+    - name: Test raw connectivity to AIX
+      ansible.builtin.raw: echo "Connection successful"
+      register: raw_test
+      changed_when: false
+      
+    - name: Display raw test result
+      ansible.builtin.debug:
+        var: raw_test.stdout_lines
+    
+    - name: Get AIX hostname
+      ansible.builtin.raw: hostname
+      register: aix_hostname
+      changed_when: false
+      
+    - name: Get AIX OS level
+      ansible.builtin.raw: oslevel -s
+      register: aix_oslevel
+      changed_when: false
+      
+    - name: Display AIX info
+      ansible.builtin.debug:
+        msg: |
+          Host: {{ inventory_hostname }}
+          Hostname: {{ aix_hostname.stdout | trim }}
+          OS Level: {{ aix_oslevel.stdout | trim }}
+          
+    - name: Test directory creation (non-destructive)
+      ansible.builtin.raw: test -d /tmp/ansible_test || mkdir -p /tmp/ansible_test && echo "OK"
+      register: dir_test
+      changed_when: false
+      
+    - name: Verify directory test
+      ansible.builtin.debug:
+        msg: "Directory test: {{ dir_test.stdout | trim }}"
+
+- name: Connectivity test summary
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Display summary
+      ansible.builtin.debug:
+        msg: |
+          ========================================
+          Connectivity Test Summary
+          ========================================
+          All hosts are reachable via SSH
+          
+          Next steps:
+          1. Run playbooks/01_prepare_source.yml to prepare the source system
+          2. Run playbooks/02_backup_source.yml to create backups
+          3. Run playbooks/03_transfer_artifacts.yml to transfer files
+          4. Run playbooks/04_restore_target_datavg.yml to restore on target
+          5. Run playbooks/05_validate_migration.yml to validate
+          
+          Or run all at once with playbooks/site.yml
+          ========================================

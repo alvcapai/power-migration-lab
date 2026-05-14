@@ -1,0 +1,43 @@
+---
+# Playbook: 01_prepare_source.yml
+# Purpose: Prepare AIX source system for migration
+# Usage: ansible-playbook -i inventory/inventory.ini playbooks/01_prepare_source.yml
+
+- name: Prepare AIX source system
+  hosts: aix_source
+  gather_facts: false
+  vars:
+    prepare_log: "{{ backup_dir_aix }}/prepare-{{ ansible_date_time.epoch }}.log"
+  
+  tasks:
+    - name: Include aix_common role
+      ansible.builtin.include_role:
+        name: aix_common
+    
+    - name: Include aix_prepare_source role
+      ansible.builtin.include_role:
+        name: aix_prepare_source
+
+- name: Preparation summary
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Display summary
+      ansible.builtin.debug:
+        msg: |
+          ========================================
+          AIX Source Preparation Complete
+          ========================================
+          
+          Completed tasks:
+          - Created backup directory: {{ backup_dir_aix }}
+          - Created data volume group: {{ source_data_vg }}
+          - Created logical volume: {{ source_data_lv }}
+          - Created filesystem: {{ appdata_mount }}
+          - Generated fake application data
+          
+          Next step:
+          Run playbooks/02_backup_source.yml to create backups
+          ========================================
+
+# Made with Bob

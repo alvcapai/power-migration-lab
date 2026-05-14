@@ -1,0 +1,10 @@
+---
+# Default variables for aix_common role
+
+# Backup directory
+backup_dir_aix: "/backup"
+
+# Common AIX commands timeout
+aix_command_timeout: 300
+
+# Made with Bob

@@ -1,0 +1,34 @@
+---
+# Host-specific variables for AIX target instance
+
+# Host identification
+host_role: "target"
+host_description: "AIX target system for migration"
+
+# AIX-specific settings
+aix_oslevel_expected: "7300-02"
+aix_architecture: "chrp"
+
+# Restore settings
+perform_restvg: true
+restvg_options: "-f"
+
+# Target disk for restore
+# MUST be specified explicitly before running restore
+# Example: hdisk1, hdisk2, etc.
+# This is a DESTRUCTIVE operation - disk will be overwritten
+restore_disk: ""
+
+# Volume groups expected after restore
+vgs_expected:
+  - "datavg"
+
+# Filesystems expected after restore
+filesystems_expected:
+  - "/appdata"
+
+# Validation settings
+validate_after_restore: true
+compare_with_source: true
+
+# Made with Bob

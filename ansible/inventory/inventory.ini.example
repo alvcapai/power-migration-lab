@@ -1,0 +1,24 @@
+# Example Ansible Inventory
+# Generate actual inventory from Terraform outputs:
+#   terraform output -json > tf_outputs.json
+#   python3 inventory/generate_inventory.py tf_outputs.json > inventory/inventory.ini
+
+[bastion]
+linux-staging ansible_host=52.116.128.42 ansible_user=root
+
+[aix_source]
+aix-src-01 ansible_host=192.168.100.4 ansible_user=root
+
+[aix_target]
+aix-dst-01 ansible_host=192.168.100.5 ansible_user=root
+
+[aix_nim]
+# aix-nim-01 ansible_host=192.168.100.6 ansible_user=root
+
+[aix:children]
+aix_source
+aix_target
+# aix_nim
+
+# COS Bucket: pml-migration-artifacts-a1b2c3d4
+# PowerVS Workspace: pml-migration-lab

@@ -1,0 +1,48 @@
+---
+# Role: aix_common
+# Purpose: Common tasks for all AIX hosts
+
+- name: Get AIX hostname
+  ansible.builtin.raw: hostname
+  register: aix_hostname_raw
+  changed_when: false
+
+- name: Set hostname fact
+  ansible.builtin.set_fact:
+    aix_hostname: "{{ aix_hostname_raw.stdout | trim }}"
+
+- name: Get AIX OS level
+  ansible.builtin.raw: oslevel -s
+  register: aix_oslevel_raw
+  changed_when: false
+
+- name: Set OS level fact
+  ansible.builtin.set_fact:
+    aix_oslevel: "{{ aix_oslevel_raw.stdout | trim }}"
+
+- name: Display AIX system information
+  ansible.builtin.debug:
+    msg: |
+      Hostname: {{ aix_hostname }}
+      OS Level: {{ aix_oslevel }}
+      Role: {{ host_role | default('undefined') }}
+
+- name: Check if backup directory exists
+  ansible.builtin.raw: test -d {{ backup_dir_aix }} && echo "exists" || echo "not_exists"
+  register: backup_dir_check
+  changed_when: false
+
+- name: Create backup directory if needed
+  ansible.builtin.raw: mkdir -p {{ backup_dir_aix }}
+  when: "'not_exists' in backup_dir_check.stdout"
+
+- name: Verify backup directory
+  ansible.builtin.raw: ls -ld {{ backup_dir_aix }}
+  register: backup_dir_verify
+  changed_when: false
+
+- name: Display backup directory info
+  ansible.builtin.debug:
+    var: backup_dir_verify.stdout_lines
+
+# Made with Bob

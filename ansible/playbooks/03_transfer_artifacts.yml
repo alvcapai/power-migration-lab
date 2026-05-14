@@ -1,0 +1,56 @@
+---
+# Playbook: 03_transfer_artifacts.yml
+# Purpose: Transfer backup artifacts from source to staging to target
+# Usage: ansible-playbook -i inventory/inventory.ini playbooks/03_transfer_artifacts.yml
+
+- name: Prepare staging directories
+  hosts: bastion
+  gather_facts: false
+  tasks:
+    - name: Create staging directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - "{{ staging_dir_linux }}"
+        - "{{ staging_dir_linux }}/artifacts"
+        - "{{ staging_dir_linux }}/logs"
+
+- name: Transfer artifacts
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Include artifact_transfer role
+      ansible.builtin.include_role:
+        name: artifact_transfer
+
+- name: Transfer summary
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Display summary
+      ansible.builtin.debug:
+        msg: |
+          ========================================
+          Artifact Transfer Complete
+          ========================================
+          
+          Transfer flow:
+          1. AIX Source -> Linux Staging
+          2. Linux Staging -> AIX Target
+          {% if enable_cos_upload %}
+          3. Linux Staging -> IBM Cloud Object Storage
+          {% endif %}
+          
+          Artifacts transferred:
+          - {{ rootvg_mksysb_name }}
+          - {{ datavg_savevg_name }}
+          - Backup logs
+          
+          Next step:
+          Run playbooks/04_restore_target_datavg.yml to restore on target
+          (Remember to set target_restore_disk and confirm_destructive_actions=true)
+          ========================================
+
+# Made with Bob

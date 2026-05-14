@@ -1,0 +1,32 @@
+---
+# Host-specific variables for AIX source instance
+
+# Host identification
+host_role: "source"
+host_description: "AIX source system for migration"
+
+# AIX-specific settings
+aix_oslevel_expected: "7300-02"
+aix_architecture: "chrp"
+
+# Backup settings
+perform_mksysb: true
+perform_savevg: true
+mksysb_options: "-i"
+savevg_options: "-f"
+
+# Volume groups to backup
+vgs_to_backup:
+  - "datavg"
+
+# Filesystems to validate
+filesystems_to_validate:
+  - "/appdata"
+
+# Data disk configuration
+# This should be set based on actual available disks
+# Example: hdisk1, hdisk2, etc.
+# Leave empty to auto-detect (with caution)
+data_disk: ""
+
+# Made with Bob
